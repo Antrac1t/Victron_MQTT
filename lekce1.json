@@ -1,0 +1,474 @@
+[
+    {
+        "id": "cc54b88b6cbd72af",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "rele 1 OFF",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "relay",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "FVE1",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 240,
+        "y": 240,
+        "wires": [
+            [
+                "53396d2f4be792ad"
+            ]
+        ]
+    },
+    {
+        "id": "53396d2f4be792ad",
+        "type": "function",
+        "z": "863ccc75b47f8363",
+        "name": "FVE1 rele deska",
+        "func": "//pro ukonceni info v debug okne zakomentuj vse kde je node.warn\nvar payload = msg.payload;\nvar topic = msg.topic;\nvar relay = msg.relay;\n\n//kontrola statusu rele true=ON, false=off\nif (payload === true || payload === \"true\") {\n    msg.payload = \"ON\";\n    node.warn(\"Zapinam rele \" + relay);\n} else {\n    msg.payload = \"OFF\";\n    node.warn(\"Vypinam rele \" + relay);\n}\n\n// vytvoreni finalniho topiku pro mqtt \nmsg.topic = \"cmnd/\" + topic + \"/POWER\" + relay;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 400,
+        "wires": [
+            [
+                "598dfc36d4728e08"
+            ]
+        ]
+    },
+    {
+        "id": "ee19563e484328c4",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "rele 1 ON",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "relay",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "FVE1",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 240,
+        "y": 280,
+        "wires": [
+            [
+                "53396d2f4be792ad"
+            ]
+        ]
+    },
+    {
+        "id": "ba729972e872b7ae",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "rele 2 ON",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "relay",
+                "v": "2",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "FVE1",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 240,
+        "y": 360,
+        "wires": [
+            [
+                "53396d2f4be792ad"
+            ]
+        ]
+    },
+    {
+        "id": "db9689f5f0244d0f",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "rele 2 OFF",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "relay",
+                "v": "2",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "FVE1",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 240,
+        "y": 320,
+        "wires": [
+            [
+                "53396d2f4be792ad"
+            ]
+        ]
+    },
+    {
+        "id": "a83c4f40b5bffaf8",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "rele 3 ON",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "relay",
+                "v": "3",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "FVE1",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 240,
+        "y": 400,
+        "wires": [
+            [
+                "53396d2f4be792ad"
+            ]
+        ]
+    },
+    {
+        "id": "598dfc36d4728e08",
+        "type": "mqtt out",
+        "z": "863ccc75b47f8363",
+        "name": "",
+        "topic": "",
+        "qos": "2",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "bf44a280a302c8b4",
+        "x": 630,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "dd96965cdecdaf21",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "rele 3 OFF",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "relay",
+                "v": "3",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "FVE1",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 240,
+        "y": 440,
+        "wires": [
+            [
+                "53396d2f4be792ad"
+            ]
+        ]
+    },
+    {
+        "id": "37235ed97a473716",
+        "type": "mqtt out",
+        "z": "863ccc75b47f8363",
+        "name": "",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "bf44a280a302c8b4",
+        "x": 630,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "b84037e01fc9ffdf",
+        "type": "mqtt out",
+        "z": "863ccc75b47f8363",
+        "name": "",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "bf44a280a302c8b4",
+        "x": 630,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "50dd66f69e5d4ffb",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 100,
+        "wires": [
+            [
+                "5596365f85cd00e7"
+            ]
+        ]
+    },
+    {
+        "id": "41e5bda41e6df5a6",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 160,
+        "wires": [
+            [
+                "bd7bcc3bd4fd71b4"
+            ]
+        ]
+    },
+    {
+        "id": "5596365f85cd00e7",
+        "type": "function",
+        "z": "863ccc75b47f8363",
+        "name": "rele OFF",
+        "func": "msg.payload = \"OFF\";\n\nmsg.topic = \"cmnd/FVE_01/POWER1\";\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 100,
+        "wires": [
+            [
+                "37235ed97a473716"
+            ]
+        ]
+    },
+    {
+        "id": "bd7bcc3bd4fd71b4",
+        "type": "function",
+        "z": "863ccc75b47f8363",
+        "name": "rele ON",
+        "func": "msg.payload = \"ON\";\n\nmsg.topic = \"cmnd/FVE_01/POWER1\";\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 160,
+        "wires": [
+            [
+                "b84037e01fc9ffdf"
+            ]
+        ]
+    },
+    {
+        "id": "6a90ef3ab5077653",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "rele 4 ON",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "relay",
+                "v": "4",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "FVE1",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 240,
+        "y": 480,
+        "wires": [
+            [
+                "53396d2f4be792ad"
+            ]
+        ]
+    },
+    {
+        "id": "615ccac919c0349e",
+        "type": "inject",
+        "z": "863ccc75b47f8363",
+        "name": "rele 4 OFF",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "relay",
+                "v": "4",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "FVE1",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 240,
+        "y": 520,
+        "wires": [
+            [
+                "53396d2f4be792ad"
+            ]
+        ]
+    },
+    {
+        "id": "bf44a280a302c8b4",
+        "type": "mqtt-broker",
+        "name": "victron",
+        "broker": "10.0.0.3",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    }
+]
