@@ -1,0 +1,543 @@
+[
+    {
+        "id": "5637d6c30a541715",
+        "type": "debug",
+        "z": "0496c4f830650bcc",
+        "name": "debug 85",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "ee30567275f2f9f0",
+        "type": "json",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 630,
+        "y": 40,
+        "wires": [
+            [
+                "60f7ecf388e21b62",
+                "85f6a1beabf68ec6"
+            ]
+        ]
+    },
+    {
+        "id": "c4a34a84e1690932",
+        "type": "file in",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "filename": "/data/home/nodered/.node-red/Devices.json",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 390,
+        "y": 40,
+        "wires": [
+            [
+                "ee30567275f2f9f0"
+            ]
+        ]
+    },
+    {
+        "id": "60f7ecf388e21b62",
+        "type": "function",
+        "z": "0496c4f830650bcc",
+        "name": "MaxDevFnc",
+        "func": "var devices = msg.payload;\nvar deviceArray = [];\n\nfor (var key in devices) {\n    if (devices.hasOwnProperty(key)) {\n        deviceArray.push({ id: key, name: devices[key] });\n    }\n}\n\nvar deviceCount = deviceArray.length;\n\nmsg.payload = deviceCount;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 40,
+        "wires": [
+            [
+                "193b20ae5b0036f1"
+            ]
+        ]
+    },
+    {
+        "id": "85f6a1beabf68ec6",
+        "type": "function",
+        "z": "0496c4f830650bcc",
+        "name": "DevList",
+        "func": "var devices = msg.payload;\n\n// Prepare an array to hold rows for the table\nvar rows = [];\n\n// Iterate through each device and create a row object\ndevices.forEach(function(device) {\n    rows.push({\n        id: device.id,\n        name: device.name\n    });\n});\n\n// Save the devices to flow context\nflow.set('devices', devices);\n\n// Prepare the message object to send to the UI Template\nmsg.payload = {\n    rows: rows\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 100,
+        "wires": [
+            [
+                "84986d3909634145"
+            ]
+        ]
+    },
+    {
+        "id": "25821e7b8be6ea17",
+        "type": "inject",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 40,
+        "wires": [
+            [
+                "c4a34a84e1690932"
+            ]
+        ]
+    },
+    {
+        "id": "193b20ae5b0036f1",
+        "type": "change",
+        "z": "0496c4f830650bcc",
+        "name": "Set Devices",
+        "rules": [
+            {
+                "t": "set",
+                "p": "MaxDevices",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 990,
+        "y": 40,
+        "wires": [
+            [
+                "5637d6c30a541715"
+            ]
+        ]
+    },
+    {
+        "id": "84986d3909634145",
+        "type": "ui_template",
+        "z": "0496c4f830650bcc",
+        "group": "b1f4c50b.934ac",
+        "name": "DeviceList",
+        "order": 1,
+        "width": "5",
+        "height": "10",
+        "format": "<style>\n    table {\n        width: 100%;\n        border-collapse: collapse;\n    }\n    table, th, td {\n        border: 1px solid #ddd;\n        padding: 10px;\n        text-align: left;\n    }\n    th {\n        background-color: #f2f2f2;\n    }\n    button.delete-button {\n        background-color: #f44336;\n        color: white;\n        border: none;\n        padding: 8px 12px;\n        text-align: center;\n        text-decoration: none;\n        display: inline-block;\n        font-size: 14px;\n        cursor: pointer;\n        border-radius: 4px;\n    }\n    button.delete-button:hover {\n        background-color: #cc0000;\n    }\n</style>\n<table>\n    <tr>\n        <th>Název zařízení</th>\n        <th></th>\n    </tr>\n    <!-- Loop through rows and create table rows -->\n    <tr ng-repeat=\"row in msg.payload.rows track by $index\">\n        <td>{{ row.name }}</td>\n       <td><button class=\"delete-button\" ng-click=\"deleteDevice(row.id, $index)\">Smazat</button></td>\n    </tr>\n</table>\n\n<script>\n    (function(scope) {\n        scope.$watch('msg', function(msg) {\n            if (msg && msg.payload && msg.payload.rows) {\n                scope.rows = msg.payload.rows;\n            }\n        });\n\n        scope.deleteDevice = function(deviceId, index) {\n            scope.rows.splice(index, 1);\n            scope.send({ payload: { rows: scope.rows } });\n\n        };\n    })(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 970,
+        "y": 100,
+        "wires": [
+            [
+                "da6c5564ba8a33f5"
+            ]
+        ]
+    },
+    {
+        "id": "43d0fdde73bd14f6",
+        "type": "function",
+        "z": "0496c4f830650bcc",
+        "name": "addNewDev",
+        "func": "var newDeviceName = msg.payload;\nvar devices = flow.get('devices') || [];\nvar maxDeviceId = flow.get('MaxDevices') || 0;\n\n// Increment the max device ID\nmaxDeviceId += 1;\n\n// Create new device object\nvar newDevice = {\n    id: 'Device' + maxDeviceId,\n    name: newDeviceName\n};\n\n// Add new device to the devices array\ndevices.push(newDevice);\n\n// Update the flow context with the new device list and max device ID\n\nflow.set('MaxDevices', maxDeviceId);\n\n// Prepare the message object to send to the UI Template\nmsg.payload = {\n    rows: devices\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 180,
+        "wires": [
+            [
+                "5622da6654266d50",
+                "84986d3909634145"
+            ]
+        ]
+    },
+    {
+        "id": "da6c5564ba8a33f5",
+        "type": "function",
+        "z": "0496c4f830650bcc",
+        "name": "ReorderDevList",
+        "func": "\nvar devices = msg.payload.rows;\n\n// Přeindexování zařízení\ndevices.forEach(function(device, index) {\n    device.id = 'Device' + (index + 1);\n});\n\nflow.set('devices', devices);\n\nmsg.payload = devices; // Aktualizované pole zařízení\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1140,
+        "y": 100,
+        "wires": [
+            [
+                "b0abb1d8cae01579",
+                "1b39067c8a4d6065"
+            ]
+        ]
+    },
+    {
+        "id": "b573f57d.6290e8",
+        "type": "ui_button",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "group": "b1f4c50b.934ac",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Přidat zařízení",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "NewDeviceName",
+        "payloadType": "flow",
+        "topic": "",
+        "topicType": "str",
+        "x": 440,
+        "y": 180,
+        "wires": [
+            [
+                "43d0fdde73bd14f6",
+                "01bcbe598b19b215"
+            ]
+        ]
+    },
+    {
+        "id": "5622da6654266d50",
+        "type": "debug",
+        "z": "0496c4f830650bcc",
+        "name": "debug 87",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "b0abb1d8cae01579",
+        "type": "debug",
+        "z": "0496c4f830650bcc",
+        "name": "debug 86",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1320,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "1b39067c8a4d6065",
+        "type": "json",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 1310,
+        "y": 140,
+        "wires": [
+            [
+                "4591d388496e2e24"
+            ]
+        ]
+    },
+    {
+        "id": "58d47e08.81ffc",
+        "type": "link in",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "links": [
+            "eb06ed9d.7f23f"
+        ],
+        "x": 295,
+        "y": 180,
+        "wires": [
+            [
+                "b573f57d.6290e8"
+            ]
+        ]
+    },
+    {
+        "id": "01bcbe598b19b215",
+        "type": "function",
+        "z": "0496c4f830650bcc",
+        "name": "clear textbox",
+        "func": "msg.payload=\"\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 120,
+        "wires": [
+            [
+                "1330b995.eb0626"
+            ]
+        ]
+    },
+    {
+        "id": "4591d388496e2e24",
+        "type": "file",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "filename": "/data/home/nodered/.node-red/Devices.json",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1550,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1330b995.eb0626",
+        "type": "ui_text_input",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "group": "b1f4c50b.934ac",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": "100",
+        "topic": "",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "str",
+        "x": 360,
+        "y": 240,
+        "wires": [
+            [
+                "2ffeee02.29d762"
+            ]
+        ]
+    },
+    {
+        "id": "93b54b1c.311778",
+        "type": "inject",
+        "z": "0496c4f830650bcc",
+        "name": "Init with empty string",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 140,
+        "y": 240,
+        "wires": [
+            [
+                "1330b995.eb0626"
+            ]
+        ]
+    },
+    {
+        "id": "2ffeee02.29d762",
+        "type": "change",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "NewDeviceName",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 240,
+        "wires": [
+            [
+                "fe2d6e02.ad949"
+            ]
+        ]
+    },
+    {
+        "id": "fe2d6e02.ad949",
+        "type": "switch",
+        "z": "0496c4f830650bcc",
+        "name": "is empty?",
+        "property": "NewDeviceName",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "empty"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 780,
+        "y": 240,
+        "wires": [
+            [
+                "db2479e4.104468"
+            ],
+            [
+                "fa23a260.4e161"
+            ]
+        ]
+    },
+    {
+        "id": "db2479e4.104468",
+        "type": "change",
+        "z": "0496c4f830650bcc",
+        "name": "enabled false",
+        "rules": [
+            {
+                "t": "set",
+                "p": "enabled",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 970,
+        "y": 220,
+        "wires": [
+            [
+                "eb06ed9d.7f23f"
+            ]
+        ]
+    },
+    {
+        "id": "fa23a260.4e161",
+        "type": "change",
+        "z": "0496c4f830650bcc",
+        "name": "enabled true",
+        "rules": [
+            {
+                "t": "set",
+                "p": "enabled",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 970,
+        "y": 260,
+        "wires": [
+            [
+                "eb06ed9d.7f23f"
+            ]
+        ]
+    },
+    {
+        "id": "eb06ed9d.7f23f",
+        "type": "link out",
+        "z": "0496c4f830650bcc",
+        "name": "",
+        "links": [
+            "58d47e08.81ffc"
+        ],
+        "x": 1095,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "b1f4c50b.934ac",
+        "type": "ui_group",
+        "name": "Seznam zařízení",
+        "tab": "e547cf80.bac6c",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e547cf80.bac6c",
+        "type": "ui_tab",
+        "name": "FVE-Vytěžování nastavení",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
